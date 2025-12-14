@@ -45,25 +45,19 @@ export default function Stats({ selectedWeek, refreshKey }) {
 	};
 
 	const barOptions = {
+		responsive: true, // ✅ ADD THIS
 		plugins: {
 			legend: { display: false },
 			tooltip: { enabled: true },
 		},
 		scales: {
 			x: {
-				grid: {
-					display: false,
-					color: "rgba(255,255,255,0.1)",
-				},
-				ticks: {
-					color: "#9ca3af",
-				},
+				grid: { display: false },
+				ticks: { color: "#9ca3af" },
 			},
 			y: {
 				min: 0,
-				grid: {
-					color: "rgba(255,255,255,0.1)",
-				},
+				grid: { color: "rgba(255,255,255,0.1)" },
 				ticks: {
 					stepSize: 1,
 					color: "#9ca3af",
@@ -76,6 +70,7 @@ export default function Stats({ selectedWeek, refreshKey }) {
 	// Donut Data
 	const donutData = {
 		labels: ["Done", "Remaining"],
+		responsive: true, // ✅ ADD THIS
 		datasets: [
 			{
 				data: [percent, 100 - percent],
