@@ -106,7 +106,10 @@ export default function Stats({ selectedWeek, refreshKey }) {
 				</div>
 			</div>
 
-			<div className="flex-1 mt-8 p-4 bg-neutral-900 rounded-lg border border-neutral-800">
+			<div
+				className="mt-8 p-4 bg-neutral-900 rounded-lg border border-neutral-800"
+				style={{ height: "185px" }} // 👈 ADD THIS
+			>
 				<Bar data={barData} options={barOptions} />
 			</div>
 		</div>
