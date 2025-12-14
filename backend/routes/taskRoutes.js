@@ -19,6 +19,6 @@ router.put("/:id", protect, updateTask);
 router.patch("/:id/toggle", protect, toggleTask);
 
 router.delete("/:id", protect, deleteTask);
-router.post("/reset-all", authenticate, resetAllData);
+router.post("/reset-all", protect, resetAllData);
 
 export default router;
