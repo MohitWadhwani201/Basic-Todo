@@ -6,7 +6,12 @@
 /* =========================
    THEME TOKENS (GLOBAL)
    ========================= */
-
+html {
+	font-size: 14px;
+}
+html {
+	zoom: 0.7;
+}
 :root {
 	/* Fonts */
 	--font-sans: "Poppins", ui-sans-serif, system-ui, sans-serif;
@@ -116,4 +121,30 @@
 	background: var(--primary-hover);
 	transform: translateY(-2px);
 	box-shadow: 0 4px 15px rgba(209, 117, 87, 0.4);
+}
+/* 🔒 Prevent flex children from resizing unpredictably */
+*,
+*::before,
+*::after {
+	box-sizing: border-box;
+}
+
+/* 🔒 Fix flex overflow + zoom resizing issues */
+.flex {
+	min-width: 0;
+	min-height: 0;
+}
+
+/* 🔒 Prevent font-metric zoom jumps */
+html {
+	text-size-adjust: 100%;
+	-webkit-text-size-adjust: 100%;
+}
+
+/* 🔒 Stabilize rendering across environments */
+body {
+	overflow-x: hidden;
+}
+canvas {
+	display: block;
 }

@@ -48,7 +48,7 @@ export default function HabitTracker({ selectedWeek, todayIndex }) {
 	};
 
 	return (
-		<div className="w-full h-full flex flex-col bg-black border border-neutral-800 text-white rounded-2xl">
+		<div className="w-full h-full flex flex-col bg-black border border-neutral-800 text-white rounded-2xl" style={{ minWidth: 0, minHeight: 0 }}>
 			{/* Header */}
 			<div className="bg-black font-semibold text-center py-5 border-b border-neutral-800 tracking-wide text-xl">
 				Habit Tracker — Week {selectedWeek + 1}
