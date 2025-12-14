@@ -11,6 +11,7 @@ export default function Dashboard() {
 	const [loaded, setLoaded] = useState(false);
 	const [statsRefreshKey, setStatsRefreshKey] = useState(0);
 	const [currentWeekIndex, setCurrentWeekIndex] = useState(0);
+	const [resetKey, setResetKey] = useState(0);
 
 	const navigate = useNavigate();
 
@@ -52,8 +53,9 @@ export default function Dashboard() {
 
 		try {
 			await API.post("/tasks/reset-all");
-			await loadCurrent(); // ✅ SAFE NOW
+			await loadCurrent();
 			setStatsRefreshKey((k) => k + 1);
+			setResetKey((k) => k + 1); // 👈 THIS
 		} catch (err) {
 			alert("Failed to reset data. Check console.");
 			console.error(err);
@@ -120,6 +122,7 @@ export default function Dashboard() {
 					>
 						<div className="p-6">
 							<HabitTracker
+								key={`habit-${resetKey}`}
 								selectedWeek={selectedWeek}
 								todayIndex={todayIndex}
 								currentWeekIndex={currentWeekIndex}
@@ -142,6 +145,7 @@ export default function Dashboard() {
 				</div>
 
 				<TaskManager
+					key={`task-${resetKey}`}
 					week={selectedWeek}
 					todayIndex={todayIndex}
 					onStatsRefresh={refreshStats}
