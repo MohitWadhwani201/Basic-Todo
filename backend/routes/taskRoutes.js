@@ -5,7 +5,8 @@ import {
   getTasks,
   updateTask,
   deleteTask,
-  toggleTask
+  toggleTask,
+  resetAllData
 } from "../controllers/taskController.js";
 
 const router = express.Router();
@@ -18,5 +19,6 @@ router.put("/:id", protect, updateTask);
 router.patch("/:id/toggle", protect, toggleTask);
 
 router.delete("/:id", protect, deleteTask);
+router.post("/reset-all", authenticate, resetAllData);
 
 export default router;
