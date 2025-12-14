@@ -1,6 +1,6 @@
 import Task from "../models/Task.js";
 import Habit from "../models/Habit.js";
-
+import User from "../models/User.js";
 export const createTask = async (req, res) => {
 	const { title, dayIndex, weekIndex } = req.body;
 
@@ -36,27 +36,30 @@ export const deleteTask = async (req, res) => {
 };
 
 export const resetAllData = async (req, res) => {
-	const userId = req.user.id;
+	try {
+		const userId = req.user._id;
 
-	// 1️⃣ Delete all tasks
-	await Task.deleteMany({ userId });
+		// 1️⃣ Delete all tasks
+		await Task.deleteMany({ userId });
 
-	// 2️⃣ Reset habits (uncheck everything)
-	await Habit.updateMany(
-		{ userId },
-		{
-			$set: {
-				weeks: [Array(7).fill(false), Array(7).fill(false), Array(7).fill(false), Array(7).fill(false)],
-			},
+		// 2️⃣ Reset habits safely (uncheck only)
+		const habits = await Habit.find({ userId });
+
+		for (const habit of habits) {
+			habit.weeks = Array.from({ length: 4 }, () => Array(7).fill(false));
+			await habit.save();
 		}
-	);
 
-	// 3️⃣ 🔥 RESET TIME (Week 1 Day 1)
-	await User.findByIdAndUpdate(userId, {
-		cycleStartDate: new Date(),
-	});
+		// 3️⃣ Reset cycle start date (Week 1 Day 1)
+		await User.findByIdAndUpdate(userId, {
+			cycleStartDate: new Date(),
+		});
 
-	res.json({ success: true });
+		res.json({ success: true });
+	} catch (err) {
+		console.error("Reset failed:", err);
+		res.status(500).json({ message: "Failed to reset data" });
+	}
 };
 
 // 🔥 NEW — toggle completion

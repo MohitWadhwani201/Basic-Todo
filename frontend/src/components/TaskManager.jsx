@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 const WEEK_DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 const MIN_ROWS = 4;
 
-export default function TaskManager({ week, onStatsRefresh, todayIndex, currentWeekIndex }) {
+export default function TaskManager({ week, onStatsRefresh, todayIndex, currentWeekIndex,key }) {
 	const [tasks, setTasks] = useState([]);
 	const [editing, setEditing] = useState({});
 	const [cellValues, setCellValues] = useState({});
@@ -162,11 +162,11 @@ export default function TaskManager({ week, onStatsRefresh, todayIndex, currentW
 							flex: "0 0 14.28%", // 🔒 prevents resizing
 							minWidth: 0,
 							backgroundColor:
-								week + 1 === currentWeekIndex && dayIndex === todayIndex
+								week  === currentWeekIndex && dayIndex === todayIndex
 									? "rgba(249, 115, 22, 0.12)" // orange-500 with opacity
 									: undefined,
 							borderColor:
-								week + 1 === currentWeekIndex && dayIndex === todayIndex
+								week  === currentWeekIndex && dayIndex === todayIndex
 									? "#f97316" // orange-500
 									: undefined,
 						}}

@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import API from "../api/api";
 import { Plus, X } from "lucide-react";
 
-export default function HabitTracker({ selectedWeek, todayIndex, currentWeekIndex }) {
+export default function HabitTracker({ selectedWeek, todayIndex, currentWeekIndex , key}) {
 	const DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 
 	const [habits, setHabits] = useState([]);
@@ -107,12 +107,12 @@ export default function HabitTracker({ selectedWeek, todayIndex, currentWeekInde
 									className="border border-neutral-800 p-4 text-center"
 									style={{
 										backgroundColor:
-											selectedWeek + 1 === currentWeekIndex &&
+											selectedWeek  === currentWeekIndex &&
 											idx === todayIndex
 												? "rgba(249, 115, 22, 0.12)"
 												: undefined,
 										borderColor:
-											selectedWeek + 1 === currentWeekIndex &&
+											selectedWeek  === currentWeekIndex &&
 											idx === todayIndex
 												? "#f97316"
 												: undefined,
@@ -159,13 +159,13 @@ export default function HabitTracker({ selectedWeek, todayIndex, currentWeekInde
 											className="border p-4 text-center bg-black"
 											style={{
 												backgroundColor:
-													selectedWeek + 1 ===
+													selectedWeek  ===
 														currentWeekIndex &&
 													idx === todayIndex
 														? "rgba(249, 115, 22, 0.12)"
 														: undefined,
 												borderColor:
-													selectedWeek + 1 ===
+													selectedWeek ===
 														currentWeekIndex &&
 													idx === todayIndex
 														? "#f97316"

@@ -5,6 +5,10 @@ const router = express.Router();
 export const getCurrentWeek = async (req, res) => {
 	const user = await User.findById(req.user.id);
 
+	if (!user) {
+		return res.status(404).json({ message: "User not found" });
+	}
+
 	if (!user.cycleStartDate) {
 		user.cycleStartDate = new Date();
 		await user.save();
@@ -20,6 +24,7 @@ export const getCurrentWeek = async (req, res) => {
 
 	res.json({ weekIndex, dayIndex });
 };
+
 
 router.get("/", protect, getCurrentWeek);
 export default router;
