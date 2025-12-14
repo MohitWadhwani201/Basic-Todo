@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import API from "../api/api";
 import { Plus, X } from "lucide-react";
 
-export default function HabitTracker({ selectedWeek, todayIndex }) {
+export default function HabitTracker({ selectedWeek, todayIndex, currentWeekIndex }) {
 	const DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 
 	const [habits, setHabits] = useState([]);
@@ -48,7 +48,10 @@ export default function HabitTracker({ selectedWeek, todayIndex }) {
 	};
 
 	return (
-		<div className="w-full h-full flex flex-col bg-black border border-neutral-800 text-white rounded-2xl" style={{ minWidth: 0, minHeight: 0 }}>
+		<div
+			className="w-full h-full flex flex-col bg-black border border-neutral-800 text-white rounded-2xl"
+			style={{ minWidth: 0, minHeight: 0 }}
+		>
 			{/* Header */}
 			<div className="bg-black font-semibold text-center py-5 border-b border-neutral-800 tracking-wide text-xl">
 				Habit Tracker — Week {selectedWeek + 1}
@@ -56,7 +59,8 @@ export default function HabitTracker({ selectedWeek, todayIndex }) {
 
 			{/* Add Habit */}
 			<div className="p-6 flex gap-5 border-b border-neutral-800">
-				<input style={{fontSize:"20px"}}
+				<input
+					style={{ fontSize: "20px" }}
 					value={name}
 					onChange={(e) => setName(e.target.value)}
 					onKeyDown={(e) => e.key === "Enter" && add()}
@@ -74,7 +78,7 @@ export default function HabitTracker({ selectedWeek, todayIndex }) {
 
 				<button
 					onClick={add}
-					style={{height:"32px",width:"150px"}}
+					style={{ height: "32px", width: "150px" }}
 					className="
 						px-7 py-4
 						bg-black text-green-400
@@ -94,11 +98,26 @@ export default function HabitTracker({ selectedWeek, todayIndex }) {
 			<div className="overflow-auto p-4">
 				<table className="w-full border-separate border-spacing-1 text-base">
 					<thead className="sticky top-0 bg-black z-10">
-						<tr className="text-neutral-400" style={{height:"25px"}}>
+						<tr className="text-neutral-400" style={{ height: "25px" }}>
 							<th className="border border-neutral-800 p-5 text-left">Habit</th>
 
-							{DAYS.map((d) => (
-								<th key={d} className="border border-neutral-800 p-4 text-center">
+							{DAYS.map((d, idx) => (
+								<th
+									key={d}
+									className="border border-neutral-800 p-4 text-center"
+									style={{
+										backgroundColor:
+											selectedWeek + 1 === currentWeekIndex &&
+											idx === todayIndex
+												? "rgba(249, 115, 22, 0.12)"
+												: undefined,
+										borderColor:
+											selectedWeek + 1 === currentWeekIndex &&
+											idx === todayIndex
+												? "#f97316"
+												: undefined,
+									}}
+								>
 									{d}
 								</th>
 							))}
@@ -137,7 +156,21 @@ export default function HabitTracker({ selectedWeek, todayIndex }) {
 									{currentWeek.map((checked, idx) => (
 										<td
 											key={idx}
-											className="border border-neutral-800 p-4 text-center bg-black"
+											className="border p-4 text-center bg-black"
+											style={{
+												backgroundColor:
+													selectedWeek + 1 ===
+														currentWeekIndex &&
+													idx === todayIndex
+														? "rgba(249, 115, 22, 0.12)"
+														: undefined,
+												borderColor:
+													selectedWeek + 1 ===
+														currentWeekIndex &&
+													idx === todayIndex
+														? "#f97316"
+														: undefined,
+											}}
 										>
 											<div
 												onClick={() => toggleDay(h._id, idx)}

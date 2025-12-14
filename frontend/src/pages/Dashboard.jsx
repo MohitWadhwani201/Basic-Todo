@@ -122,7 +122,11 @@ export default function Dashboard() {
 						className="flex-1 bg-[var(--bg-card)] rounded-2xl shadow border border-[var(--border)]"
 					>
 						<div className="p-6">
-							<HabitTracker selectedWeek={selectedWeek} todayIndex={todayIndex} />
+							<HabitTracker
+								selectedWeek={selectedWeek}
+								todayIndex={todayIndex}
+								currentWeekIndex={currentWeekIndex}
+							/>
 						</div>
 					</div>
 				</div>
