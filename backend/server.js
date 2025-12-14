@@ -14,7 +14,29 @@ connectDB();
 
 const app = express();
 
-app.use(cors());
+// ✅ CORS CONFIG
+const allowedOrigins = [
+  "http://localhost:5173", // local Vite
+  "http://localhost:3000", // optional
+  "https://basic-todo-392x.onrender.com", // deployed frontend
+];
+
+app.use(
+  cors({
+    origin: function (origin, callback) {
+      // allow requests with no origin (Postman, mobile apps)
+      if (!origin) return callback(null, true);
+
+      if (allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
+    credentials: true,
+  })
+);
+
 app.use(express.json());
 
 // ✅ API routes
@@ -24,13 +46,13 @@ app.use("/api/habits", habitRoutes);
 app.use("/api/stats", statsRoutes);
 app.use("/api/current-week", currentWeekRoutes);
 
-// ✅ Health check / root route
+// ✅ Health check
 app.get("/", (req, res) => {
-	res.send("API is running...");
+  res.send("API is running...");
 });
 
-// ✅ PORT FIX
+// ✅ PORT
 const PORT = process.env.PORT || 10000;
 app.listen(PORT, () => {
-	console.log(`Server running on PORT ${PORT}`);
+  console.log(`Server running on PORT ${PORT}`);
 });
