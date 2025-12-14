@@ -17,6 +17,27 @@ export default function Dashboard() {
 	const refreshStats = () => {
 		setStatsRefreshKey((k) => k + 1);
 	};
+	const loadCurrent = async () => {
+		try {
+			const res = await API.get("/current-week");
+
+			const weekIndex = Number.isInteger(res.data?.weekIndex) ? res.data.weekIndex : 0;
+
+			const dayIndex = Number.isInteger(res.data?.dayIndex) ? res.data.dayIndex : 0;
+
+			setCurrentWeekIndex(weekIndex);
+			setTodayIndex(dayIndex);
+			setSelectedWeek(weekIndex);
+		} catch (err) {
+			console.error("Failed to load current week/day", err);
+			setCurrentWeekIndex(0);
+			setSelectedWeek(0);
+			setTodayIndex(0);
+		} finally {
+			setLoaded(true);
+		}
+	};
+
 	const resetEverything = async () => {
 		const confirmed = window.confirm(
 			"⚠️ WARNING!\n\n" +
@@ -31,7 +52,8 @@ export default function Dashboard() {
 
 		try {
 			await API.post("/tasks/reset-all");
-			loadCurrent(); // reload week/day
+			await loadCurrent(); // ✅ SAFE NOW
+			setStatsRefreshKey((k) => k + 1);
 		} catch (err) {
 			alert("Failed to reset data. Check console.");
 			console.error(err);
@@ -45,31 +67,6 @@ export default function Dashboard() {
 	};
 
 	useEffect(() => {
-		const loadCurrent = async () => {
-			try {
-				const res = await API.get("/current-week");
-
-				const weekIndex = Number.isInteger(res.data?.weekIndex) ? res.data.weekIndex : 0;
-
-				const dayIndex = Number.isInteger(res.data?.dayIndex) ? res.data.dayIndex : 0;
-
-				// 👉 "Today" reference (never changes unless date changes)
-				setCurrentWeekIndex(weekIndex);
-				setTodayIndex(dayIndex);
-
-				// 👉 Initial selected week (user is viewing current week by default)
-				setSelectedWeek(weekIndex);
-			} catch (err) {
-				console.error("Failed to load current week/day", err);
-
-				setCurrentWeekIndex(0);
-				setSelectedWeek(0);
-				setTodayIndex(0);
-			} finally {
-				setLoaded(true);
-			}
-		};
-
 		loadCurrent();
 	}, []);
 
