@@ -6,151 +6,232 @@ import TaskManager from "../components/TaskManager";
 import API from "../api/api";
 
 export default function Dashboard() {
-  const [selectedWeek, setSelectedWeek] = useState(0);
-  const [todayIndex, setTodayIndex] = useState(null);
-  const [loaded, setLoaded] = useState(false);
-  const [statsRefreshKey, setStatsRefreshKey] = useState(0);
+	const [selectedWeek, setSelectedWeek] = useState(0);
+	const [todayIndex, setTodayIndex] = useState(null);
+	const [loaded, setLoaded] = useState(false);
+	const [statsRefreshKey, setStatsRefreshKey] = useState(0);
+	const [currentWeekIndex, setCurrentWeekIndex] = useState(0);
 
-  const navigate = useNavigate();
+	const navigate = useNavigate();
 
-  const refreshStats = () => {
-    setStatsRefreshKey((k) => k + 1);
-  };
+	const refreshStats = () => {
+		setStatsRefreshKey((k) => k + 1);
+	};
+	const resetEverything = async () => {
+		const confirmed = window.confirm(
+			"⚠️ WARNING!\n\n" +
+				"This will:\n" +
+				"• Delete ALL tasks from all 4 weeks\n" +
+				"• Reset ALL habit checkboxes\n\n" +
+				"📸 Please take screenshots if you want to keep a record.\n\n" +
+				"Click OK to continue or Cancel to abort."
+		);
 
-  // 🔐 LOGOUT HANDLER
-  const logout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
-    navigate("/");
-  };
+		if (!confirmed) return;
 
-  // ✅ LOAD CURRENT WEEK + DAY
-  useEffect(() => {
-    const loadCurrent = async () => {
-      try {
-        const res = await API.get("/current-week");
+		try {
+			await API.post("/tasks/reset-all");
+			window.location.reload(); // simplest way to reflect reset
+		} catch (err) {
+			alert("Failed to reset data. Check console.");
+			console.error(err);
+		}
+	};
 
-        const week =
-          Number.isInteger(res.data?.weekIndex) ? res.data.weekIndex : 0;
-        const day =
-          Number.isInteger(res.data?.dayIndex) ? res.data.dayIndex : 0;
+	const logout = () => {
+		localStorage.removeItem("token");
+		localStorage.removeItem("user");
+		navigate("/");
+	};
 
-        setSelectedWeek(week);
-        setTodayIndex(day);
-      } catch (err) {
-        console.error("Failed to load current week/day", err);
-        setSelectedWeek(0);
-        setTodayIndex(0);
-      } finally {
-        setLoaded(true);
-      }
-    };
+	useEffect(() => {
+		const loadCurrent = async () => {
+			try {
+				const res = await API.get("/current-week");
 
-    loadCurrent();
-  }, []);
+				const weekIndex = Number.isInteger(res.data?.weekIndex) ? res.data.weekIndex : 0;
 
-  // ⛔ BLOCK RENDER UNTIL READY
-  if (!loaded || todayIndex === null) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600 mx-auto mb-4"></div>
-          <span className="text-gray-500 text-lg">
-            Loading dashboard...
-          </span>
-        </div>
-      </div>
-    );
-  }
+				const dayIndex = Number.isInteger(res.data?.dayIndex) ? res.data.dayIndex : 0;
 
-  return (
-    <div className="relative min-h-screen w-full bg-gray-50 flex flex-col gap-8 p-8">
-      {/* HEADER */}
-      <div>
-        <h1 className="text-2xl font-bold text-gray-800">
-          Dashboard Overview
-        </h1>
-        <p className="text-gray-600 mt-1">
-          Week {selectedWeek + 1} progress and tasks
-        </p>
-      </div>
+				// 👉 "Today" reference (never changes unless date changes)
+				setCurrentWeekIndex(weekIndex);
+				setTodayIndex(dayIndex);
 
-      {/* TOP GRID */}
-      <div className="flex h-[45%] w-full gap-8">
-        <div className="flex-1 bg-white rounded-xl shadow border p-6">
-          <Stats
-            selectedWeek={selectedWeek}
-            refreshKey={statsRefreshKey}
-          />
-        </div>
+				// 👉 Initial selected week (user is viewing current week by default)
+				setSelectedWeek(weekIndex);
+			} catch (err) {
+				console.error("Failed to load current week/day", err);
 
-        <div className="flex-1 bg-white rounded-xl shadow border p-6">
-          <HabitTracker
-            selectedWeek={selectedWeek}
-            todayIndex={todayIndex}
-          />
-        </div>
-      </div>
+				setCurrentWeekIndex(0);
+				setSelectedWeek(0);
+				setTodayIndex(0);
+			} finally {
+				setLoaded(true);
+			}
+		};
 
-      {/* TASK MANAGER */}
-      <div className="h-[45%] w-full">
-        <div className="bg-white h-full rounded-2xl shadow border p-8">
-          <h2 className="text-2xl font-bold text-gray-800 mb-2">
-            Task Manager
-          </h2>
-          <p className="text-gray-600 mb-6">
-            Tasks for Week {selectedWeek + 1}
-          </p>
+		loadCurrent();
+	}, []);
 
-          <TaskManager
-            week={selectedWeek}
-            todayIndex={todayIndex}
-            onStatsRefresh={refreshStats}
-          />
-        </div>
-      </div>
+	if (!loaded || todayIndex === null) {
+		return (
+			<div className="min-h-screen flex items-center justify-center bg-[var(--bg-dark)]">
+				<div className="text-center">
+					<div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[var(--primary)] mx-auto mb-4"></div>
+					<span className="text-[var(--text-muted)] text-lg">Loading dashboard...</span>
+				</div>
+			</div>
+		);
+	}
 
-      {/* WEEK SWITCHER */}
-      <div className="pt-6">
-        <div className="bg-white rounded-2xl shadow border px-8 py-6">
-          <h3 className="text-lg font-semibold text-center mb-4">
-            Select Week
-          </h3>
+	return (
+		<div className="relative min-h-screen w-full bg-[var(--bg-dark)] px-8 py-10 pb-28 space-y-10">
+			{/* HEADER */}
+			<div>
+				<h1 className="text-3xl font-bold text-[var(--text-primary)]">Dashboard Overview</h1>
+				<p className="text-[var(--text-muted)] mt-1">Week {selectedWeek + 1} progress and tasks</p>
+			</div>
 
-          <div className="flex justify-center gap-6">
-            {["Week 1", "Week 2", "Week 3", "Week 4"].map((label, i) => (
-              <button
-                key={i}
-                onClick={() => setSelectedWeek(i)}
-                className={`px-8 py-3 rounded-xl border-2 transition ${
-                  selectedWeek === i
-                    ? "bg-green-50 border-green-500 text-green-700 font-semibold"
-                    : "border-gray-300 text-gray-700 hover:bg-gray-50"
-                }`}
-              >
-                {label}
-              </button>
-            ))}
-          </div>
-        </div>
-      </div>
+			{/* STATS + HABITS (VISIBLE SEPARATION FIX) */}
+			<div className="bg-[var(--bg-dark)] p-3 rounded-3xl">
+				<div className="flex w-full gap-10">
+					<div
+						style={{
+							marginRight: "10px",
+							marginBottom: "20px",
+							marginLeft: "8px",
+							marginTop: "8px",
+							padding: "4px",
+							borderRadius: "10px",
+						}}
+						className="flex-1 bg-[var(--bg-card)] rounded-2xl shadow border border-[var(--border)]"
+					>
+						<div className="p-6">
+							<Stats selectedWeek={selectedWeek} refreshKey={statsRefreshKey} />
+						</div>
+					</div>
 
-      {/* 🚪 FLOATING LOGOUT BUTTON (BOTTOM-RIGHT) */}
-      <button
-        onClick={logout}
-        className="
-          fixed bottom-6 right-6 z-50
-          flex items-center justify-center
-          px-6 py-3 rounded-full
-          bg-red-500 text-white font-semibold
-          shadow-xl hover:shadow-2xl
-          hover:bg-red-600
-          active:scale-95
-          transition-all
-        "
-      >
-        Logout
-      </button>
-    </div>
-  );
+					<div
+						style={{
+							marginRight: "8px",
+							marginBottom: "20px",
+							marginTop: "8px",
+							padding: "4px",
+							borderRadius: "10px",
+						}}
+						className="flex-1 bg-[var(--bg-card)] rounded-2xl shadow border border-[var(--border)]"
+					>
+						<div className="p-6">
+							<HabitTracker selectedWeek={selectedWeek} todayIndex={todayIndex} />
+						</div>
+					</div>
+				</div>
+			</div>
+
+			{/* TASK MANAGER */}
+			<div
+				style={{ marginBottom: "10px" }}
+				className="bg-[var(--bg-card)] rounded-2xl shadow border border-[var(--border)] p-8 space-y-4"
+			>
+				<div>
+					<h2 className="text-2xl font-bold text-[var(--text-primary)]">Task Manager</h2>
+					<p style={{ paddingBottom: "10px" }} className="text-[var(--text-muted)]">
+						Tasks for Week {selectedWeek + 1}
+					</p>
+				</div>
+
+				<TaskManager
+					week={selectedWeek}
+					todayIndex={todayIndex}
+					onStatsRefresh={refreshStats}
+					currentWeekIndex={currentWeekIndex}
+				/>
+			</div>
+
+			{/* WEEK SWITCHER */}
+			<div className="bg-[var(--bg-card)] rounded-2xl shadow border border-[var(--border)] px-8 py-6">
+				<h3
+					className="text-lg font-semibold text-center mb-6 text-[var(--text-primary)]"
+					style={{ paddingBottom: "5px" }}
+				>
+					Select Week
+				</h3>
+
+				<div className="flex justify-center flex-wrap gap-4">
+					{["Week 1", "Week 2", "Week 3", "Week 4"].map((label, i) => (
+						<button
+							style={{
+								paddingRight: "5px",
+								paddingLeft: "5px",
+								marginLeft: "5px",
+								marginRight: "5px",
+							}}
+							key={i}
+							onClick={() => setSelectedWeek(i)}
+							className={`px-6 py-2 rounded-xl border transition ${
+								selectedWeek === i
+									? "bg-[var(--primary)] text-white border-transparent font-semibold"
+									: "border-[var(--border)] text-[var(--text-secondary)] hover:bg-[var(--bg-element)]"
+							}`}
+						>
+							{label}
+						</button>
+					))}
+				</div>
+			</div>
+
+			{/* LOGOUT BUTTON */}
+			<div className="fixed bottom-6 right-6 z-50 flex items-center gap-4">
+				<button
+					style={{
+						marginLeft: "80px",
+						marginTop: "10px",
+						background: "#8f0000",
+						width: "200px",
+						height: "25px",
+						opacity: ".8",
+						cursor: "pointer",
+						border: "none",
+					}}
+					onClick={resetEverything}
+					className="
+			px-6 py-3 rounded-xl
+			bg-red-900 text-white
+			border border-red-700
+			shadow-lg
+			hover:bg-red-700
+			active:scale-95
+			transition-all
+		"
+				>
+					⚠️ Reset All Data
+				</button>
+
+				<button
+					style={{
+						marginLeft: "80px",
+						marginTop: "10px",
+						background: "#8f0000",
+						width: "125px",
+						height: "25px",
+						opacity: ".8",
+						cursor: "pointer",
+					}}
+					onClick={logout}
+					className="
+			px-6 py-3 rounded-xl
+			bg-[var(--bg-card)]
+			text-[var(--text-secondary)]
+			border border-[var(--border)]
+			shadow-lg
+			hover:bg-red-600 hover:text-white hover:border-red-600
+			active:scale-95
+			transition-all
+		"
+				>
+					Logout
+				</button>
+			</div>
+		</div>
+	);
 }

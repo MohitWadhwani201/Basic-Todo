@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 const WEEK_DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 const MIN_ROWS = 4;
 
-export default function TaskManager({ week, onStatsRefresh, todayIndex }) {
+export default function TaskManager({ week, onStatsRefresh, todayIndex, currentWeekIndex }) {
 	const [tasks, setTasks] = useState([]);
 	const [editing, setEditing] = useState({});
 	const [cellValues, setCellValues] = useState({});
@@ -147,115 +147,155 @@ export default function TaskManager({ week, onStatsRefresh, todayIndex }) {
 		setEditing((ed) => ({ ...ed, [newPlaceholders[0]._id]: true }));
 		setTimeout(() => inputRefs.current[newPlaceholders[0]._id]?.focus(), 30);
 	};
-
+	// console.log("todayIndex:", todayIndex);
+	// console.log("currentWeekIndex:", currentWeekIndex);	
 	return (
-		<div className="w-full h-full flex flex-col bg-black " >
+		<div className="w-full h-full flex flex-col bg-black ">
 			{/* GRID */}
 			<div className="flex gap-3 h-full p-4">
-				{WEEK_DAYS.map((day, dayIndex) => (
-					<div
-						key={day}
-						className={`flex flex-col rounded-xl overflow-hidden border ${
-							dayIndex === todayIndex
-								? "border-emerald-500 bg-gray-900"
-								: "border-gray-800 bg-gray-900"
-						}`}
-						style={{ width: "14.28%" }}
-					>
-						<div className="px-4 py-4 text-base font-semibold text-center bg-gray-800 border-b border-gray-700 text-white">
-							{day}
-						</div>
-
-						<div className="flex-1 overflow-auto p-4 space-y-4 bg-black ">
-							{tasksByDay[dayIndex].map((task) => (
-								<div
-									key={task._id}
-									style={{fontSize:"20px"}}
-									className={`flex items-center gap-4 px-5 py-4 min-h-[56px] rounded-xl transition-colors hover:bg-gray-900 ${
-										task.empty
-											? "border border-dashed border-gray-800"
-											: "bg-gray-900"
-									}`}
-								>
-									{/* Text */}
-									{editing[task._id] ? (
-										<input
-											ref={(el) => (inputRefs.current[task._id] = el)}
-											className="flex-1 text-base outline-none bg-transparent text-white placeholder-gray-500 "
-											style={{ height: "26px" }}
-											value={cellValues[task._id] ?? ""}
-											onChange={(e) =>
-												setCellValues((v) => ({
-													...v,
-													[task._id]: e.target.value,
-												}))
-											}
-											onBlur={() => {
-												handleSave(task, cellValues[task._id]);
-												setEditing((ed) => ({
-													...ed,
-													[task._id]: false,
-												}));
-											}}
-											onKeyDown={(e) => onKeyDown(e, task)}
-											// placeholder="Type here…"
-										/>
-									) : (
-										<div
-											onClick={() => startEditing(task)}
-											className={`flex-1 text-base cursor-text ${
-												task.completed
-													? "line-through text-gray-400"
-													: "text-white"
-											} ${task.empty ? "italic text-gray-500" : ""}`}
-										>
-											{task.title || "Type here…"}
-										</div>
-									)}
-
-									{/* CHECKBOX */}
-									<div
-										onClick={() => toggleTask(task)}
-										style={{
-											width: "26px",
-											height: "26px",
-											cursor: task.empty ? "not-allowed" : "pointer",
-											backgroundColor: task.completed
-												? "#10b981"
-												: "transparent",
-											border: `2px solid ${
-												task.completed ? "#10b981" : "#4b5563"
-											}`,
-											borderRadius: "6px",
-											opacity: task.empty ? 0.5 : 1,
-										}}
-									>
-										{task.completed && (
-											<svg
-												className="w-5 h-5 mx-auto mt-1"
-												fill="none"
-												viewBox="0 0 24 24"
-												stroke="white"
-											>
-												<path
-													strokeLinecap="round"
-													strokeLinejoin="round"
-													strokeWidth={2.5}
-													d="M5 13l4 4L19 7"
-												/>
-											</svg>
-										)}
-									</div>
+				{WEEK_DAYS.map(
+					(day, dayIndex) =>
+						  (
+							<div
+								key={day}
+								className="flex flex-col rounded-xl overflow-hidden border"
+								style={{
+									width: "14.28%",
+									backgroundColor:
+										week+1 === currentWeekIndex && dayIndex === todayIndex
+											? "rgba(249, 115, 22, 0.12)" // orange-500 with opacity
+											: undefined,
+									borderColor:
+										week+1 === currentWeekIndex && dayIndex === todayIndex
+											? "#f97316" // orange-500
+											: undefined
+								}}
+							>
+								<div className="px-4 py-4 text-base font-semibold text-center bg-gray-800 border-b border-gray-700 text-white">
+									{day}
 								</div>
-							))}
-						</div>
-					</div>
-				))}
+
+								<div className="flex-1 overflow-auto p-4 space-y-4 bg-black ">
+									{tasksByDay[dayIndex].map((task) => (
+										<div
+											key={task._id}
+											style={{
+												fontSize: "20px",
+												paddingLeft: "10px",
+												paddingRight: "10px",
+											}}
+											className={`flex items-center gap-4 px-5 py-4 min-h-[56px] rounded-xl transition-colors hover:bg-gray-900 ${
+												task.empty
+													? "border border-dashed border-gray-800"
+													: "bg-gray-900 border border-dashed border-gray-100"
+											}`}
+										>
+											{/* Text */}
+											{editing[task._id] ? (
+												<input
+													ref={(el) =>
+														(inputRefs.current[
+															task._id
+														] = el)
+													}
+													className="flex-1 text-base outline-none bg-transparent text-white placeholder-gray-500 "
+													style={{ height: "26px" }}
+													value={cellValues[task._id] ?? ""}
+													onChange={(e) =>
+														setCellValues((v) => ({
+															...v,
+															[task._id]:
+																e.target
+																	.value,
+														}))
+													}
+													onBlur={() => {
+														handleSave(
+															task,
+															cellValues[task._id]
+														);
+														setEditing((ed) => ({
+															...ed,
+															[task._id]: false,
+														}));
+													}}
+													onKeyDown={(e) =>
+														onKeyDown(e, task)
+													}
+													// placeholder="Type here…"
+												/>
+											) : (
+												<div
+													onClick={() => startEditing(task)}
+													className={`flex-1 text-base cursor-text ${
+														task.completed
+															? "line-through text-gray-400"
+															: "text-white"
+													} ${
+														task.empty
+															? "italic text-gray-500"
+															: ""
+													}`}
+												>
+													{task.title || "Type here…"}
+												</div>
+											)}
+
+											{/* CHECKBOX */}
+											<div
+												onClick={() => toggleTask(task)}
+												style={{
+													width: "26px",
+													height: "26px",
+													cursor: task.empty
+														? "not-allowed"
+														: "pointer",
+													backgroundColor: task.completed
+														? "#10b981"
+														: "transparent",
+													border: `2px solid ${
+														task.completed
+															? "#10b981"
+															: "#4b5563"
+													}`,
+													borderRadius: "6px",
+													opacity: task.empty ? 0.5 : 1,
+												}}
+											>
+												{task.completed && (
+													<svg
+														className="w-5 h-5 mx-auto mt-1"
+														fill="none"
+														viewBox="0 0 24 24"
+														stroke="white"
+													>
+														<path
+															strokeLinecap="round"
+															strokeLinejoin="round"
+															strokeWidth={2.5}
+															d="M5 13l4 4L19 7"
+														/>
+													</svg>
+												)}
+											</div>
+										</div>
+									))}
+								</div>
+							</div>
+						)
+				)}
 			</div>
 
 			{/* BUTTONS */}
 			<div className="w-full mt-3 pt-8 pb-5 bg-gray-900 border-t border-gray-800 flex justify-center gap-8">
 				<button
+					style={{
+						marginRight: "5px",
+						marginBottom: "5px",
+						marginTop: "5px",
+						padding: "4px",
+						borderRadius: "3px",
+					}}
 					onClick={addRowToAllDays}
 					className="px-8 py-4 rounded-xl bg-gray-800 border border-gray-700 text-base font-semibold text-white hover:bg-gray-700 hover:border-emerald-500 transition"
 				>
@@ -263,8 +303,15 @@ export default function TaskManager({ week, onStatsRefresh, todayIndex }) {
 				</button>
 
 				<button
+					style={{
+						marginLeft: "5px",
+						marginBottom: "5px",
+						marginTop: "5px",
+						padding: "4px",
+						borderRadius: "3px",
+					}}
 					onClick={removeBottomRow}
-					className={`px-8 py-4 rounded-xl text-base font-semibold border transition ${
+					className={`px-8 py-4 rounded-xl text-base font-semibold border transition border-1  ${
 						isBottomRowEmpty() && tasksByDay[0].length > MIN_ROWS
 							? "bg-gray-800 text-red-400 border-gray-700 hover:border-red-500 hover:bg-gray-700"
 							: "bg-gray-900 text-gray-600 border-gray-800 cursor-not-allowed"

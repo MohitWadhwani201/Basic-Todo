@@ -1,24 +1,15 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import url("https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;...&display=swap");
 
-/* Add to your global CSS or Dashboard.css */
-.h-\[45\%\] {
-	height: 45%;
-}
+@import "tailwindcss/preflight";
+@import "tailwindcss/utilities";
 
-.h-\[10\%\] {
-	height: 10%;
-}
+/* =========================
+   THEME TOKENS (GLOBAL)
+   ========================= */
 
-.overflow-hidden {
-	overflow: hidden;
-}
-
-.overflow-y-auto {
-	overflow-y: auto;
-}
 :root {
+	/* Fonts */
+	--font-sans: "Poppins", ui-sans-serif, system-ui, sans-serif;
 	--primary: #d17557;
 	--primary-hover: #b86045;
 	--bg-dark: #1f1f1f;
@@ -35,6 +26,40 @@
 	--radius-lg: 16px;
 	--transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
+
+/* =========================
+   TAILWIND THEME BRIDGE
+   ========================= */
+
+@theme inline {
+	--font-sans: var(--font-sans);
+
+	--color-background: var(--bg-dark);
+	--color-foreground: var(--text-primary);
+
+	--color-primary: var(--primary);
+	--color-primary-foreground: var(--text-primary);
+
+	--color-border: var(--border);
+	--color-muted: var(--text-muted);
+}
+
+/* =========================
+   BASE STYLES
+   ========================= */
+
+@layer base {
+	body {
+		font-family: var(--font-sans);
+		background-color: var(--bg-dark);
+		color: var(--text-primary);
+	}
+}
+
+/* =========================
+   AUTHENTICATION STYLES
+   ========================= */
+
 .auth-container {
 	display: flex;
 	justify-content: center;
@@ -43,7 +68,6 @@
 	padding: 1rem;
 	background: linear-gradient(135deg, var(--bg-dark) 0%, #2a2a2a 100%);
 }
-
 .auth-form {
 	background: var(--bg-card);
 	padding: clamp(2rem, 5vw, 3rem);
@@ -52,7 +76,6 @@
 	width: min(95%, 400px);
 	border: 1px solid rgba(255, 255, 255, 0.05);
 }
-
 .auth-form h2 {
 	text-align: center;
 	margin-bottom: 2rem;
@@ -60,7 +83,6 @@
 	font-size: 1.75rem;
 	font-weight: 700;
 }
-
 .auth-form input {
 	width: 100%;
 	padding: 1rem;
@@ -72,13 +94,11 @@
 	font-size: 1rem;
 	transition: var(--transition);
 }
-
 .auth-form input:focus {
 	outline: none;
 	border-color: var(--primary);
 	box-shadow: 0 0 0 3px rgba(209, 117, 87, 0.1);
 }
-
 .auth-form button {
 	width: 100%;
 	padding: 1rem;
@@ -92,7 +112,6 @@
 	cursor: pointer;
 	margin-top: 0.5rem;
 }
-
 .auth-form button:hover {
 	background: var(--primary-hover);
 	transform: translateY(-2px);
