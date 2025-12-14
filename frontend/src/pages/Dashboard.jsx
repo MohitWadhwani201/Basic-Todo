@@ -31,7 +31,7 @@ export default function Dashboard() {
 
 		try {
 			await API.post("/tasks/reset-all");
-			window.location.reload(); // simplest way to reflect reset
+			loadCurrent(); // reload week/day
 		} catch (err) {
 			alert("Failed to reset data. Check console.");
 			console.error(err);

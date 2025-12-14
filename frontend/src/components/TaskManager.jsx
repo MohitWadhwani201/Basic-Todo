@@ -175,7 +175,7 @@ export default function TaskManager({ week, onStatsRefresh, todayIndex, currentW
 							{day}
 						</div>
 
-						<div className="flex-1 overflow-auto p-4 space-y-4 bg-black ">
+						<div className="flex-1 overflow-hidden p-4 space-y-4 bg-black ">
 							{tasksByDay[dayIndex].map((task) => (
 								<div
 									key={task._id}
