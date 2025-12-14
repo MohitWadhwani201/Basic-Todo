@@ -26,9 +26,9 @@ export default function Dashboard() {
 
 			const dayIndex = Number.isInteger(res.data?.dayIndex) ? res.data.dayIndex : 0;
 
-			setCurrentWeekIndex(weekIndex);
+			setCurrentWeekIndex(weekIndex - 1);
 			setTodayIndex(dayIndex);
-			setSelectedWeek(weekIndex);
+			setSelectedWeek(weekIndex - 1);
 		} catch (err) {
 			console.error("Failed to load current week/day", err);
 			setCurrentWeekIndex(0);

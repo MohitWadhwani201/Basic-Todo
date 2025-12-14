@@ -1,30 +1,27 @@
 import express from "express";
 import { protect } from "../middleware/authMiddleware.js";
-
+import User from "../models/User.js";
 const router = express.Router();
 
-router.get("/", protect, (req, res) => {
-  const today = new Date();
+router.get("/", protect, getCurrentWeek);
+export const getCurrentWeek = async (req, res) => {
+  const user = await User.findById(req.user.id);
 
-  // ✅ Monday = 0, Sunday = 6
-  const dayIndex = (today.getDay() + 6) % 7;
+  if (!user.cycleStartDate) {
+    user.cycleStartDate = new Date();
+    await user.save();
+  }
 
-  // ✅ Calculate week of year (ISO-like, simple & stable)
-  const startOfYear = new Date(today.getFullYear(), 0, 1);
-  const daysPassed = Math.floor(
-    (today - startOfYear) / (1000 * 60 * 60 * 24)
+  const start = new Date(user.cycleStartDate);
+  const now = new Date();
+
+  const diffDays = Math.floor(
+    (now - start) / (1000 * 60 * 60 * 24)
   );
 
-  const weekOfYear = Math.floor(daysPassed / 7); // 0–51
+  const weekIndex = Math.floor(diffDays / 7) % 4; // 0–3
+  const dayIndex = diffDays % 7; // 0–6
 
-  // ✅ Map 52 weeks → 4 habit weeks
-  const weekIndex = weekOfYear % 4; // 0–3
-
-  res.json({
-    dayIndex,
-    weekIndex,
-    weekOfYear, // optional (useful for debugging)
-  });
-});
-
+  res.json({ weekIndex, dayIndex });
+};
 export default router;
